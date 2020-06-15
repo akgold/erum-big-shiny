@@ -4,7 +4,8 @@ library(httr)
 library(ggplot2)
 library(dplyr)
 library(leaflet)
-library(bikeR6pkg)
+
+source(here::here("app/R6_class.R"))
 
 # Create dashboard page UI
 ui <- dashboardPage(skin = "red",
@@ -46,7 +47,7 @@ server <- function(input, output, session) {
 
   plot_dat <- reactive({
     req(dat)
-    bikeR6pkg::make_plot_dat(api_client$stations, dat()$status)
+    make_plot_dat(api_client$stations, dat()$status)
   })
 
   #----- Format Outputs -----
