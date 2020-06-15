@@ -17,10 +17,11 @@ ui <- dashboardPage(skin = "red",
                         leafletOutput(
                           "map"
                         ),
-                        actionButton(
+                        shiny::actionButton(
                           "refresh",
-                          "Refresh",
-                          icon = icon('refresh')),
+                          label = "Refresh",
+                          icon("refresh")
+                        ),
                         verbatimTextOutput(
                           "last_updated"
                         ),
@@ -33,9 +34,7 @@ server <- function(input, output, session) {
   api_client <- BikeClient$new()
 
   #----- Data Gathering + Plot Data Formatting -----
-  dat <- reactive({
-    input$refresh
-
+  dat <- eventReactive(input$refresh, {
     api_client$update_status()
     list(
       last_updated = api_client$last_updated,
@@ -43,14 +42,17 @@ server <- function(input, output, session) {
     )
   })
 
-  output$last_updated <- renderText(dat()$last_updated)
-
   plot_dat <- reactive({
     req(dat)
     make_plot_dat(api_client$stations, dat()$status)
   })
 
   #----- Format Outputs -----
+  output$last_updated <- renderText({
+    req(dat)
+    dat()$last_updated
+  })
+
   output$map <- renderLeaflet({
     req(plot_dat)
 
