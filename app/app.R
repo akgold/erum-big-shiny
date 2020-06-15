@@ -105,6 +105,8 @@ server <- function(input, output, session) {
   })
 
   output$map <- renderLeaflet({
+    req(plot_dat)
+
     plot_dat() %>%
       leaflet() %>%
       addProviderTiles(
