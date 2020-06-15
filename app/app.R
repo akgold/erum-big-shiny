@@ -39,7 +39,7 @@ server <- function(input, output, session) {
     magrittr::extract2("feeds") %>%
     purrr::map_df(tibble::as.tibble)
 
-  # Get url of station feed
+  # Get URL of station feed
   station_url <- feeds %>%
     dplyr::filter(name == "station_information") %>%
     dplyr::pull(url)
@@ -88,7 +88,8 @@ server <- function(input, output, session) {
   #----- Create Plot Data -----
   plot_dat <- reactive({
     inner_join(stations, status_dat()$dat) %>%
-      mutate(name_val = glue::glue(
+      mutate(
+        plot_val = glue::glue(
         paste0(
           "<b>{name}</b><br>",
           "Bikes: {num_bikes_available}<br>",
@@ -99,7 +100,7 @@ server <- function(input, output, session) {
 
   #----- Format Outputs -----
   output$last_updated <- renderText({
-    req(status_dat)
+    req(plot_dat)
     glue::glue("Last Updated: {status_dat()$last_updated}")
   })
 
