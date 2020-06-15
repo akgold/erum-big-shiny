@@ -84,11 +84,11 @@ server <- function(input, output, session) {
     inner_join(stations, status_dat()$dat) %>%
       mutate(
         plot_val = glue::glue(
-          paste0(
-            "<b>{name}</b><br>",
-            "Bikes: {num_bikes_available}<br>",
-            "Empty Docks: {num_docks_available}"
-          ))
+        paste0(
+          "<b>{name}</b><br>",
+          "Bikes: {num_bikes_available}<br>",
+          "Empty Docks: {num_docks_available}"
+        ))
       )
   })
 
