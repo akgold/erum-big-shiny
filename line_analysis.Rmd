@@ -1,0 +1,73 @@
+---
+title: "File Length Analysis"
+author: "Alex Gold"
+date: "3/27/2020"
+output: 
+  html_document:
+    code_folding: hide
+---
+```{r, setup, message = FALSE}
+library(dplyr)
+library(ggplot2)
+library(fs)
+```
+
+```{r, warning = FALSE}
+dirs <- fs::dir_ls(".") %>%
+  purrr::keep(function(x) stringr::str_detect(x, "^0"))
+
+get_wc <- function(x) {
+  system2("wc", c("-l", x), stdout = TRUE) %>%
+    stringr::str_match("(\\d+) ") %>%
+    magrittr::extract2(2) %>%
+    as.numeric()
+}
+
+files <- dirs %>%
+  purrr::map_dfr(
+    function(x) tibble::tibble(
+    file = fs::dir_ls(x, recurse = TRUE) %>%
+      as.character(), 
+    dir = x
+    )
+  ) %>%
+  filter(
+    stringr::str_detect(file, "\\.R$"), 
+         !stringr::str_detect(file, "utils-pipe")
+    ) %>%
+  mutate(
+    lines = purrr::map_dbl(file, ~ get_wc(.)), 
+    is_app = stringr::str_detect(file, "app")
+  ) %>%
+  group_by(dir) %>%
+  mutate(tot_lines = sum(lines), 
+         mean_lines = mean(lines), 
+         n_files = glue::glue("N Files: {n()}")) %>%
+  ungroup()
+
+```
+
+```{r}
+files %>%
+  filter(is_app) %>%
+ggplot(aes(x = dir, y = tot_lines)) +
+  geom_col(fill = "#5782b2") +
+  theme_minimal() +
+  xlab("Version") +
+  ylab("Total Lines") +
+  ggtitle("Total Number of Lines Goes Up")
+```
+
+```{r}
+files %>%
+  ggplot(aes(x = dir)) +
+  geom_line(data = filter(files, is_app), 
+            aes(y = mean_lines, group = 1),
+            color = "#5782b2") +
+  geom_label(aes(y = 100, label = n_files)) +
+  geom_point(aes(y = lines)) +
+  ylab("Mean Lines Per File") +
+  theme_minimal() +
+  ggtitle("Lines Per File Goes Down a Lot")
+```
+

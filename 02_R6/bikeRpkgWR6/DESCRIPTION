@@ -1,0 +1,15 @@
+Package: bikeR6pkg
+Type: Package
+Title: Helper Functions for SatRdays Bike Demo
+Version: 0.1.0
+Authors@R: person("Alex", "Gold", email = "alexkgold@gmail.com", role = c("aut", "cre"))
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: Some fun functions!
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2
+Imports: 
+    magrittr,
+    dplyr,
+    glue

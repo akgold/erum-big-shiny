@@ -1,0 +1,12 @@
+name: erum-plumber-bikes
+title: erum-plumber-bikes
+username: alex.gold
+account: alex.gold
+server: colorado.rstudio.com
+hostUrl: https://colorado.rstudio.com/rsc/__api__
+appId: 6695
+bundleId: 38508
+url: https://colorado.rstudio.com/rsc/erum-bikes/
+when: 1592249792.30536
+asMultiple: FALSE
+asStatic: FALSE
