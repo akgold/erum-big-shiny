@@ -124,7 +124,7 @@ server <- function(input, output, session) {
           iconColor = "white",
           markerColor = "red"
         ),
-        popup = ~paste0(name_val)
+        popup = ~paste0(plot_val)
       )
   })
 }
