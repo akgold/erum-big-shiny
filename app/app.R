@@ -31,12 +31,12 @@ ui <- dashboardPage(skin = "red",
 server <- function(input, output, session) {
 
   #----- Data Gathering-----
+  my_api <- "https://colorado.rstudio.com/rsc/erum-bikes/"
+
   # Get URLS of feeds
-  feeds <- httr::GET("https://gbfs.capitalbikeshare.com/gbfs/gbfs.json") %>%
+  feeds <- file.path(my_api, "feeds") %>%
+    httr::GET() %>%
     httr::content() %>%
-    magrittr::extract2("data") %>%
-    magrittr::extract2("en") %>%
-    magrittr::extract2("feeds") %>%
     purrr::map_df(tibble::as.tibble)
 
   # Get URL of station feed
@@ -45,18 +45,15 @@ server <- function(input, output, session) {
     dplyr::pull(url)
 
   # Get stations (name, lat, long)
-  stations <- station_url %>%
-    httr::GET() %>%
-    httr::content() %>%
-    magrittr::extract2("data") %>%
-    magrittr::extract2("stations") %>%
-    purrr::map_df(function(x) {
-      tibble::as_tibble(
-        x[!names(x) %in% c("eightd_station_services",
-                           "rental_uris",
-                           "rental_methods")]
+  stations <- file.path(my_api, "feed_dat") %>%
+    httr::GET(
+      query = list(
+        feed_url = station_url
       )
-    })
+    ) %>%
+    httr::content() %>%
+    magrittr::extract2("dat") %>%
+    purrr::map_df(tibble::as.tibble)
 
   # Get URL of current status feed
   status_url <- feeds %>%
@@ -67,22 +64,19 @@ server <- function(input, output, session) {
   status_dat <- reactive({
     input$refresh
 
-    status_return <- status_url %>%
-      httr::GET() %>%
+    status <- file.path(my_api, "feed_dat") %>%
+      httr::GET(
+        query = list(
+          feed_url = status_url
+        )
+      ) %>%
       httr::content()
 
-    last_updated <- as.POSIXct(
-      status_return$last_updated,
-      origin = "1970-01-01 00:00:00 UTC"
-    )
+    status$dat <- status$dat %>%
+      purrr::map_df(tibble::as.tibble)
+    status$last_updated <- status$last_updated[[1]]
 
-    list(
-      dat = status_return %>%
-        magrittr::extract2("data")  %>%
-        magrittr::extract2("stations") %>%
-        purrr::map_df(tibble::as.tibble),
-      last_updated = last_updated
-    )
+    status
   })
 
   #----- Create Plot Data -----
