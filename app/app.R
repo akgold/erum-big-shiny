@@ -46,7 +46,15 @@ server <- function(input, output, session) {
 
   plot_dat <- reactive({
     req(dat)
-    make_plot_dat(api_client$stations, dat()$status)
+    inner_join(api_client$stations, dat()$status) %>%
+      mutate(
+        plot_val = glue::glue(
+          paste0(
+            "<b>{name}</b><br>",
+            "Bikes: {num_bikes_available}<br>",
+            "Empty Docks: {num_docks_available}"
+          ))
+      )
   })
 
   #----- Format Outputs -----
