@@ -34,7 +34,9 @@ server <- function(input, output, session) {
   api_client <- BikeClient$new()
 
   #----- Data Gathering + Plot Data Formatting -----
-  dat <- eventReactive(input$refresh, {
+  dat <- reactive({
+    input$refresh
+
     api_client$update_status()
     list(
       last_updated = api_client$last_updated,
