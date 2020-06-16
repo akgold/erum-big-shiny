@@ -74,7 +74,8 @@ server <- function(input, output, session) {
       setView(
         lng = median(plot_dat()$lon),
         lat = median(plot_dat()$lat),
-        zoom = 14) %>%
+        zoom = 14
+      ) %>%
       addAwesomeMarkers(
         lng = ~lon,
         lat = ~lat,
