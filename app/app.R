@@ -109,7 +109,8 @@ server <- function(input, output, session) {
       setView(
         lng = median(stations$lon),
         lat = median(stations$lat),
-        zoom = 14) %>%
+        zoom = 14
+      ) %>%
       addAwesomeMarkers(
         lng = ~lon,
         lat = ~lat,
